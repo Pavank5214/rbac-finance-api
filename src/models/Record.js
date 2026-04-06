@@ -7,29 +7,33 @@ const recordSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
-        amount:{
+        amount: {
             type: Number,
             required: true,
             min: 0,
         },
-        type:{
+        type: {
             type: String,
-            enum: ["income","expense"],
+            enum: ["income", "expense"],
             require: true,
         },
         category: {
             type: String,
             required: true,
             trim: true,
-          },
-          date: {
+        },
+        date: {
             type: Date,
             required: true,
-          },
-          note: {
+        },
+        note: {
             type: String,
             trim: true,
-          },
+        },
+        isDeleted: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true,

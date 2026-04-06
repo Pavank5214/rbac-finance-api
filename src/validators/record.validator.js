@@ -21,6 +21,11 @@ const getRecordsQuerySchema = Joi.object({
   endDate: Joi.date(),
   type: Joi.string().valid("income", "expense"),
   category: Joi.string(),
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(10),
+  sortBy: Joi.string().valid('date', 'amount', 'createdAt').default('createdAt'),
+  order: Joi.string().valid('asc', 'desc').default('desc'),
+  search: Joi.string().allow('', null),
 });
 
 module.exports = {

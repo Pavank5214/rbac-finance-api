@@ -6,14 +6,15 @@ A robust **RESTful API** built with **Node.js, Express, and MongoDB** for managi
 
 ## 🚀 Features
 
--   **Authentication & Security:** JWT-based authentication with hashed passwords (bcrypt).
--   **Role-Based Access Control (RBAC):** Three distinct user tiers:
-    -   `Admin`: Full access to create, read, update, and delete users and records.
-    -   `Analyst`: Can view financial records and dashboard summaries.
-    -   `Viewer`: Can only access high-level dashboard summaries.
--   **Financial Records Management:** Full CRUD capabilities with advanced filtering (by date range, category, and type).
--   **Dashboard Analytics:** Uses MongoDB Aggregation Pipelines to efficiently calculate total income, total expenses, net balance, and category-wise spending trends.
--   **Validation & Error Handling:** Centralized error handling and Joi input validation.
+-   **Authentication & Security:** JWT-based authentication with hashed passwords (bcrypt) and **Rate Limiting**.
+-   **Role-Based Access Control (RBAC):** Three distinct user tiers (`Admin`, `Analyst`, `Viewer`).
+-   **Advanced Records Management:**
+    -   **Pagination & Sorting**: Efficiently handle large datasets using `page`, `limit`, and `sortBy` query parameters.
+    -   **Search & Filters**: Search records by category or notes, and filter by date range or transaction type.
+    -   **Soft Delete**: Records are marked as deleted instead of being permanently removed, ensuring data integrity.
+-   **Dashboard Analytics:** Uses MongoDB Aggregation Pipelines to calculate core financial metrics and trends.
+-   **Interactive API Documentation:** Full **Swagger/OpenAPI** documentation available at `/api-docs`.
+-   **Reliable Logic:** Comprehensive **Unit Testing** suite with Jest.
 
 ---
 
@@ -22,7 +23,9 @@ A robust **RESTful API** built with **Node.js, Express, and MongoDB** for managi
 -   **Runtime:** Node.js
 -   **Framework:** Express.js
 -   **Database:** MongoDB & Mongoose
--   **Security:** JSON Web Token (JWT), bcryptjs
+-   **Security:** JWT, bcryptjs, express-rate-limit
+-   **Documentation:** Swagger UI, swagger-jsdoc
+-   **Testing:** Jest, Supertest
 
 ---
 
@@ -55,46 +58,56 @@ npm run dev
 # For production
 npm start
 ```
-*The server will start on `http://localhost:5000` (or your defined PORT).*
+
+**5. Run Tests**
+```bash
+# Run all tests
+npm test
+
+# Run tests with exit (CI mode)
+npm run test:ci
+```
 
 ---
 
 ## 📖 API Documentation
 
-### Authentication & User Management
+### Interactive Documentation
+The API is fully documented using Swagger. Start the server and navigate to:
+👉 **[http://localhost:5000/api-docs](http://localhost:5000/api-docs)**
+
+### Summary of Core Endpoints
+
+#### Authentication & User Management
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
 | POST | `/api/auth/register` | Public | Register a new user |
 | POST | `/api/auth/login` | Public | Login and receive JWT |
-| POST | `/api/auth/admin/create-user` | Admin | Create a user with a specific role |
 | GET | `/api/auth/admin/users` | Admin | Get all users |
-| PUT | `/api/auth/admin/users/:id` | Admin | Update user details/status |
-| DELETE | `/api/auth/admin/users/:id` | Admin | Delete a user |
 
-### Financial Records
+#### Financial Records
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
 | POST | `/api/records/` | Admin | Create a new financial record |
-| GET | `/api/records/` | Admin, Analyst | Get all records (supports `?startDate`, `?endDate`, `?type`, `?category`) |
+| GET | `/api/records/` | Admin, Analyst | Get records (supports pagination, search, sorting) |
 | GET | `/api/records/:id` | Admin, Analyst | Get a single record by ID |
-| PUT | `/api/records/:id` | Admin | Update a record |
-| DELETE | `/api/records/:id` | Admin | Delete a record |
+| DELETE | `/api/records/:id` | Admin | **Soft delete** a record |
 
-### Dashboard Summaries
+#### Dashboard Summaries
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| GET | `/api/dashboard/summary` | Admin, Analyst, Viewer | Returns total income, total expenses, and net balance |
-| GET | `/api/dashboard/categories` | Admin, Analyst, Viewer | Returns aggregated totals grouped by category |
-| GET | `/api/dashboard/trends` | Admin, Analyst, Viewer | Returns time-based financial trends |
+| GET | `/api/dashboard/summary` | Admin, Analyst, Viewer | Financial summary |
+| GET | `/api/dashboard/categories` | Admin, Analyst, Viewer | Category-wise breakdown |
+| GET | `/api/dashboard/trends` | Admin, Analyst, Viewer | Spending trends over time |
 
 ---
 
 ## 🤔 Assumptions & Design Decisions
 
-1.  **Separation of Concerns:** The application strictly follows the Controller-Service-Route architecture.
-2.  **Dashboard Aggregations:** Calculations are offloaded to the database layer using MongoDB `$aggregate` pipelines for optimal performance.
-3.  **Authentication Token:** Passed in the `Authorization` header as a Bearer token (`Bearer <token>`).
-4.  **Hard Deletes:** For simplicity in this assignment, records and users are hard-deleted.
+1.  **Controller-Service-Route Architecture:** Ensures clean separation of concerns and testability.
+2.  **Soft Deletion:** Records are flagged as `isDeleted: true` to prevent accidental data loss.
+3.  **Search & Pagination:** Implemented at the database level for optimal performance on large datasets.
+4.  **JWT Authentication:** Secure stateless session management via Bearer tokens.
 
 ---
 
